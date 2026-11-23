@@ -82,6 +82,10 @@ it, rewrite it.
   follow the same rule.
 - **No fragments, no stacked noun phrases, no colon chains.** Full sentences
   with a subject and a verb. Avoid "X: Y, Z" headlines inside prose.
+- **Do not narrate the page or coach the reader.** No "this page will walk
+  you through", "the way a textbook…", "worth reading slowly", "the subtle
+  part", "the question for the rest of the page". State the case and the
+  result; the reader is a colleague, not a student.
 - **Say who does what.** "The engine groups the tokens that share an adapter"
   rather than "adapter grouping by the engine".
 - **One term per thing, explained once.** Do not mix "bits", "位" and

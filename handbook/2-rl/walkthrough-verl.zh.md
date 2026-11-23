@@ -2,31 +2,38 @@
 
 ## 我们在哪里
 
-2.1 到 2.6 每页讲一步，各配一个小例子。这一页把这些步骤放到一个真实案例里串起来，
-就像教科书每章末尾的一道完整例题。我们跟着一个 RL 训练任务，从最初看到的现象一直走到
-rollout 和 trainer 的每个 logprob 都逐 bit 一致，每走一步都说明它来自前面哪一页。
-
-这个训练任务是在 [verl](https://github.com/verl-project/verl) 里用 GRPO 训练一个数学数据集。
-trainer 用 FSDP2 切分模型；rollout 是 vLLM，和 trainer 共用同一批 GPU，并用 CUDA graph 重放。
-模型是 gpt-oss，一个带 attention sink 和滑动窗口注意力的 MoE。测量结果和完整的软件栈都在
-[报告](../../examples/verl_fsdp2_vllm/REPORT.md)里。
+这一页把 2.1–2.6 用到一个真实的训练任务上：在 [verl](https://github.com/verl-project/verl)
+里跑 GRPO，trainer 用 FSDP2，rollout 是 vLLM，和 trainer 共用同一批 GPU 并重放 CUDA graph。
+模型是 gpt-oss，一个带 attention sink 和滑动窗口注意力的 MoE。起点是几乎每个 logprob 都不同的基线，
+终点是两端每一步都逐 bit 一致。测量结果和完整的软件栈见[报告](../../examples/verl_fsdp2_vllm/REPORT.md)。
 
 ## 现象
 
 每次更新之前，verl 会在 trainer 上重新计算采样 token 的 logprob（即"旧" logprob），
 再和 rollout 报告的 logprob 比较。同步训练里没有 staleness，所以按照
 [拆分差距](README.md#the-idea-split-the-gap-before-you-debug-it)的思路，整个差距都是数值误差。
-用 verl 原生的路径时，每一步几乎每个 logprob 的 bit 都不一样。这一页剩下的部分要回答：
-这些差异从哪里来，怎样把它们全部消掉。
+用 verl 原生的路径时，每一步几乎每个 logprob 的 bit 都不一样。
 
-```mermaid
-flowchart LR
-    R["vLLM rollout<br/>(CUDA graph replay)"] -->|"tokens + rollout logprobs"| T["trainer recomputes<br/>old logprobs (FSDP2)"]
-    T --> C{"bits equal?"}
-    C -->|"yes"| U["update"]
-    C -->|"no: stop"| L["localize"]
-    U -->|"weight sync, checked by hash"| R
-```
+<figure class="fx" data-fig="verl-loop" aria-label="对齐后的 verl 训练任务的一步：rollout、重算、比较 bit，然后更新并同步，或者停下来定位">
+<div class="fx-stage">
+<div class="fx-rows">
+<div class="fx-row"><span class="fx-label">每一步</span><div class="fx-chain is-tight"><span class="fx-node" data-hot="0 5">vLLM rollout<span class="fx-note">CUDA graph</span></span><span class="fx-arrow" data-at="1">logprob</span><span class="fx-node" data-at="1" data-hot="1">trainer<span class="fx-note">重算一遍</span></span><span class="fx-arrow" data-at="2"></span><span class="fx-node is-decision" data-at="2" data-hot="2">bit 一致吗？</span></div></div>
+<div class="fx-row" data-at="3"><span class="fx-label">全部一致</span><div class="fx-chain is-tight"><span class="fx-node to-ok" data-hot="3">更新</span><span class="fx-arrow" data-at="4">同步</span><span class="fx-node to-ok" data-at="4" data-hot="4">哈希检查<span class="fx-note">每个副本</span></span><span class="fx-arrow" data-at="5"></span><span class="fx-node" data-at="5" data-hot="5">下一次 rollout</span></div></div>
+<div class="fx-row" data-at="6"><span class="fx-label">有 bit 不同</span><div class="fx-chain is-tight"><span class="fx-node to-bad" data-hot="6">停下<span class="fx-note">在更新之前</span></span><span class="fx-arrow" data-at="7"></span><span class="fx-node to-key" data-at="7" data-hot="7">定位<span class="fx-note">在代理模型上用 OpGuard</span></span></div></div>
+</div>
+</div>
+<ol class="fx-say">
+<li>vLLM 用 CUDA graph 回放采样 token，并为每个 token 报告一个 logprob。</li>
+<li>更新之前，trainer 用同一份权重重算每个采样 token 的 old logprob。</li>
+<li data-hold="1.5">一个观察器逐 bit 比较两边的 logprob。同步训练里，任何差异都是数值误差。</li>
+<li>如果每个 bit 都一致，就执行更新。</li>
+<li data-hold="1.5">trainer 把权重同步给 vLLM，每个副本里的每个张量都算哈希，和 trainer 的比较。</li>
+<li>下一步从确认与 trainer 一致的权重开始。</li>
+<li>只要有一个 bit 不同，训练就在更新前停下，策略不会在这个差异上继续训练。</li>
+<li data-hold="2">然后在短代理模型的 eager 运行上，用 OpGuard 定位这个差异。</li>
+</ol>
+<figcaption>图：每一步在更新前逐 bit 比较 rollout 和 trainer 的 logprob；一致就更新，并同步经过哈希检查的权重；不一致就停下来定位。</figcaption>
+</figure>
 
 ## 动手之前的两个决定
 
@@ -49,7 +56,7 @@ flowchart LR
 rollout 必须先达到 L1 和 L2，任何 trainer 才可能和它对上。打开 vLLM 的 batch-invariant 模式，
 再决定 rollout 怎样编译。
 
-编译是最容易忽略的地方。Inductor 会把相邻算子融合起来，融合时跳过了一些中间的 bf16 舍入，
+Inductor 会把相邻算子融合起来，融合时跳过了一些中间的 bf16 舍入，
 trainer 要对上就得复现这些融合后的程序。这个案例保留 CUDA graph（它只是重放录制好的 kernel），
 关掉 Inductor，并选用引擎自定义的 RMSNorm 和 rotary 算子，让 trainer 能调用同样的 kernel。
 rollout 的编译配置是：
@@ -74,8 +81,8 @@ rollout 的编译配置是：
 ### 让 trainer 改用 vLLM 的 kernel
 
 trainer 的模型代码一层一层换成对 vLLM 的调用。每处替换都是一个小的 `torch.autograd.Function`：
-前向调用 vLLM 的 kernel，反向用 fp32 算出正确的梯度。token logprob 是最清楚的例子
-（这里做了简化：补丁里为了省显存是分块逐行计算的）：
+前向调用 vLLM 的 kernel，反向用 fp32 算出正确的梯度。下面是简化后的 token logprob
+（补丁里为了省显存是分块逐行计算的）：
 
 ```python
 class SelectedLogprob(torch.autograd.Function):
@@ -113,7 +120,7 @@ kernel 换好之后，还剩六处差异。每一处都在代理模型的 eager 
 | token logprob | 在词表上的归约顺序不同 | 调用 vLLM 的 logprob kernel |
 | 词表列 | vLLM 会屏蔽 lm_head 中超出 tokenizer 词表的列，trainer 却在所有列上做归一化 | 在同一个 kernel 之前把这些列填成 −inf |
 
-其中两处值得慢慢读，因为它们都不是 kernel 的问题。RoPE 表在模型里本来是对的，
+其中两处不是 kernel 的差异。RoPE 表在模型里本来是对的，
 是切分的包装层在它进入层的路上改了它。词表屏蔽是"哪些数进入 softmax"不同，而不是"怎样相加"不同。
 这两处都作为警告写在[与 vLLM 逐 bit 一致](engine-parity-vllm.md#what-can-go-wrong)一页里；
 残差加法则正是[舍入点表](../../skills/engine-parity/references/rounding-points.md)要你逐条写下的那类舍入点。

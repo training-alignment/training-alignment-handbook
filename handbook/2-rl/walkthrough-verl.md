@@ -2,18 +2,13 @@
 
 ## Where we are
 
-Pages 2.1 to 2.6 each teach one step on its own, with a small example. This
-page puts the steps together on one real case, the way a textbook ends a
-chapter with a worked problem. We follow one RL job from the first symptom to
-a run in which the rollout and the trainer agree on every logprob, and at each
-point we say which earlier page the move comes from.
-
-The job is GRPO on a math dataset in [verl](https://github.com/verl-project/verl).
-The trainer shards the model with FSDP2. The rollout is vLLM, colocated with
-the trainer on the same GPUs and replaying CUDA graphs. The model is gpt-oss,
-an MoE with attention sinks and sliding-window attention. The measurements
-and the exact stack are in the
-[report](../../examples/verl_fsdp2_vllm/REPORT.md).
+This page applies pages 2.1–2.6 to one real job: GRPO in
+[verl](https://github.com/verl-project/verl), an FSDP2 trainer, and a vLLM
+rollout colocated on the same GPUs and replaying CUDA graphs. The model is
+gpt-oss, an MoE with attention sinks and sliding-window attention. The job
+goes from a baseline in which nearly every logprob differs to a run in which
+the two sides agree bit for bit at every step. The measurements and the exact
+stack are in the [report](../../examples/verl_fsdp2_vllm/REPORT.md).
 
 ## The symptom
 
@@ -22,17 +17,28 @@ trainer (the "old" logprobs) and compares them with the logprobs the rollout
 reported. In a synchronous run nothing is stale, so by the
 [split of the gap](README.md#the-idea-split-the-gap-before-you-debug-it) the
 whole difference is numeric error. With verl's native path, almost every
-logprob differs in its bits, at every step. The question for the rest of the
-page is where those differences come from and how to remove all of them.
+logprob differs in its bits, at every step.
 
-```mermaid
-flowchart LR
-    R["vLLM rollout<br/>(CUDA graph replay)"] -->|"tokens + rollout logprobs"| T["trainer recomputes<br/>old logprobs (FSDP2)"]
-    T --> C{"bits equal?"}
-    C -->|"yes"| U["update"]
-    C -->|"no: stop"| L["localize"]
-    U -->|"weight sync, checked by hash"| R
-```
+<figure class="fx" data-fig="verl-loop" aria-label="One step of the aligned verl job: rollout, recompute, compare bits, then update and sync or stop and localize">
+<div class="fx-stage">
+<div class="fx-rows">
+<div class="fx-row"><span class="fx-label">each step</span><div class="fx-chain is-tight"><span class="fx-node" data-hot="0 5">vLLM rollout<span class="fx-note">CUDA graphs</span></span><span class="fx-arrow" data-at="1">logprobs</span><span class="fx-node" data-at="1" data-hot="1">trainer<span class="fx-note">recomputes them</span></span><span class="fx-arrow" data-at="2"></span><span class="fx-node is-decision" data-at="2" data-hot="2">equal bits?</span></div></div>
+<div class="fx-row" data-at="3"><span class="fx-label">all equal</span><div class="fx-chain is-tight"><span class="fx-node to-ok" data-hot="3">update</span><span class="fx-arrow" data-at="4">sync</span><span class="fx-node to-ok" data-at="4" data-hot="4">hash check<span class="fx-note">every replica</span></span><span class="fx-arrow" data-at="5"></span><span class="fx-node" data-at="5" data-hot="5">next rollout</span></div></div>
+<div class="fx-row" data-at="6"><span class="fx-label">any bit differs</span><div class="fx-chain is-tight"><span class="fx-node to-bad" data-hot="6">stop<span class="fx-note">before the update</span></span><span class="fx-arrow" data-at="7"></span><span class="fx-node to-key" data-at="7" data-hot="7">localize<span class="fx-note">OpGuard on the proxy</span></span></div></div>
+</div>
+</div>
+<ol class="fx-say">
+<li>vLLM samples the tokens, replaying CUDA graphs, and reports a logprob for each one.</li>
+<li>Before the update, the trainer recomputes the old logprob of every sampled token with the same weights.</li>
+<li data-hold="1.5">An observer compares the two logprobs bit for bit. In a synchronous run, any difference is numeric error.</li>
+<li>If every bit is equal, the update runs.</li>
+<li data-hold="1.5">The trainer syncs its weights to vLLM, and every tensor in every replica is hashed and compared with the trainer's.</li>
+<li>The next step starts from weights known to be the trainer's.</li>
+<li>If any bit differs, the run stops before the update, so the policy never trains on the gap.</li>
+<li data-hold="2">The difference is then localized with OpGuard on an eager run of the short proxy model.</li>
+</ol>
+<figcaption>Figure: every step compares the rollout's and the trainer's logprobs bit for bit before the update; an equal step updates and syncs weights checked by hash, and an unequal step stops and is localized.</figcaption>
+</figure>
 
 ## Two decisions before any code
 
@@ -59,7 +65,7 @@ Following [the whole model](whole-model.md) and step 3 of
 L2 before any trainer can match it. Switch on vLLM's batch-invariant mode, and
 decide how the rollout is compiled.
 
-The compiler is the subtle part. Inductor fuses neighbouring operators and in
+Inductor fuses neighbouring operators and in
 doing so skips some intermediate bf16 roundings, so a trainer would have to
 reproduce the fused programs to match. The case keeps CUDA graphs, which only
 replay recorded kernels, and turns Inductor off. It also selects the engine's
@@ -93,8 +99,7 @@ asks.
 The trainer's model code is replaced layer by layer with calls into vLLM. Each
 replacement is a small `torch.autograd.Function`: the forward calls vLLM's
 kernel, and the backward computes a correct gradient in fp32. The token
-logprob is the clearest example (simplified: the patch walks the rows in
-chunks to save memory):
+logprob, simplified (the patch walks the rows in chunks to save memory):
 
 ```python
 class SelectedLogprob(torch.autograd.Function):
@@ -134,7 +139,7 @@ on eager runs of the proxy, and each was fixed on the trainer side:
 | Token logprob | The reduction order over the vocabulary differed | Call vLLM's logprob kernel |
 | Vocabulary columns | vLLM masks the lm_head columns beyond the tokenizer's vocabulary; the trainer normalized over all of them | Fill those columns with −inf before the same kernel |
 
-Two of the six are worth reading slowly, because neither is a kernel. The RoPE
+Two of the six are not kernel differences. The RoPE
 table was correct in the model and was changed by the sharding wrapper on its
 way into the layer. The vocabulary mask is a difference in which numbers enter
 the softmax, not in how they are added. Both appear as warnings on the
