@@ -149,6 +149,7 @@ nav:
       - 2-rl/lora.md
       - 2-rl/engine-parity-vllm.md
       - 2-rl/rl-loop.md
+      - 2-rl/walkthrough-verl.md
   - 3 Batch-invariant kernels:
       - 3-kernels/README.md
       - 3-kernels/gemm-and-quantized.md

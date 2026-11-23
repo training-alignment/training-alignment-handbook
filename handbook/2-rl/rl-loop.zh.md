@@ -155,4 +155,5 @@ CUDA graph，以及在循环中使用生产引擎。
 - 针对真实引擎、定位到单个元素的例子：
   [报告](../../examples/cross_engine/REPORT.md#worked-example-one-element-at-q_norm)。
 - OpGuard：`docs/RLAlignment.md` 和 `rl-alignment` skill。
-- 下一步：[回归](../4-operations/regression.md)。
+- 下一步：[实战](walkthrough-verl.md)，在一个真实的训练任务上走完这一部分的每一步；
+  然后是[回归](../4-operations/regression.md)。

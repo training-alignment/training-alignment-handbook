@@ -200,4 +200,5 @@ TP/EP on either side, CUDA graphs, and a production engine inside the loop.
 - Localizing a single element against a real engine:
   [report](../../examples/cross_engine/REPORT.md#worked-example-one-element-at-q_norm).
 - OpGuard: `docs/RLAlignment.md` and the `rl-alignment` skill.
-- Next: [regression](../4-operations/regression.md).
+- Next: [walkthrough](walkthrough-verl.md), every step of this part on one
+  real job; then [regression](../4-operations/regression.md).

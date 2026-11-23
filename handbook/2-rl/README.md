@@ -42,7 +42,8 @@ production is a separate decision about cost.
 <figcaption>Figure: steps 1–5 make each side invariant on its own, step 6 makes the two sides agree, and steps 7–10 watch the running loop. Each step links to its page.</figcaption>
 </figure>
 
-The [alignment-pipeline skill](../../skills/alignment-pipeline/SKILL.md) sends
+The [walkthrough](walkthrough-verl.md) at the end of this part follows these
+steps on one real job. The [alignment-pipeline skill](../../skills/alignment-pipeline/SKILL.md) sends
 a question to the step that answers it.
 
 ## The idea: make each side stable before comparing the two
@@ -134,6 +135,8 @@ token at the rollout's own version.
 - Step pages: [whole model](whole-model.md), [parallelism](parallelism.md),
   [sampling](sampling.md), [LoRA](lora.md),
   [engine parity](engine-parity-vllm.md), [RL loop](rl-loop.md).
+- [Walkthrough](walkthrough-verl.md): every step of this part on one real job,
+  verl with FSDP2 and a vLLM rollout.
 - Results reported by other groups (IsoExec, verl-omni, TorchTitan RL) and a
   worked example that localizes a single element: [report](../../examples/cross_engine/REPORT.md#context-moved-from-the-part-2-overview);
   the sources are listed in [references](../references.md).

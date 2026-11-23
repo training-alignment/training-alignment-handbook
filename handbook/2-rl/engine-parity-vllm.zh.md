@@ -131,7 +131,8 @@ RL 循环里，参数切成 shard 的 trainer 调用引擎的 kernel 后，在�
   结果表、逐一回退的结果、引擎自身的波动、它的不变模式在哪种 GPU 上覆盖哪些算子、代价，
   以及其他团队报告的结果。
 - [完整 RL 循环的实验报告](../../examples/verl_fsdp2_vllm/REPORT.md)：一个完整的 RL 循环，
-  其中有参数切成 shard 的 trainer、MoE checkpoint、使用 CUDA graph 的 rollout，以及梯度检查。
+  其中有参数切成 shard 的 trainer、MoE checkpoint、使用 CUDA graph 的 rollout，以及梯度检查；
+  [实战](walkthrough-verl.md)一页按阶段走了一遍。
 - Skill：[engine-parity](../../skills/engine-parity/SKILL.md) 和
   [舍入点](../../skills/engine-parity/references/rounding-points.md)。
 - 代码：[examples/cross_engine/](../../examples/cross_engine/)。

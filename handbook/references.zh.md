@@ -1,7 +1,7 @@
 # 参考文献
 
 本手册用到了下面这些来源。标 * 的链接来自我们的工作笔记，发布前应再核对一遍。更完整、分好类的
-列表正在兄弟仓库 `awesome-bitwise-alignment` 里整理。
+论文、工具和博客列表见兄弟仓库 [Awesome Bitwise Alignment](https://github.com/training-alignment/awesome-bitwise-alignment)。
 
 ## 工具与方法
 

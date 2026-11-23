@@ -182,7 +182,8 @@ quantized weights.
   cost, and results reported by other groups.
 - [Full RL loop report](../../examples/verl_fsdp2_vllm/REPORT.md): a full RL
   loop with a sharded trainer, an MoE checkpoint, a CUDA-graph rollout and a
-  gradient check.
+  gradient check; the [walkthrough](walkthrough-verl.md) follows it stage by
+  stage.
 - Skill: [engine-parity](../../skills/engine-parity/SKILL.md) and
   [rounding points](../../skills/engine-parity/references/rounding-points.md).
 - Code: [examples/cross_engine/](../../examples/cross_engine/).

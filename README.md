@@ -132,6 +132,22 @@ scripts/    site build hooks and checks
 To build the site locally: `pip install mkdocs-material mkdocs-static-i18n jieba`,
 then `mkdocs serve` ([details](handbook/4-operations/README.md#building-the-site)).
 
+## Citation
+
+If this handbook, its tools or its skills help your work, please cite it.
+GitHub's "Cite this repository" button reads the same entry from
+[CITATION.cff](CITATION.cff).
+
+```bibtex
+@misc{zhou2026trainingalignment,
+  title        = {Training Alignment Handbook},
+  author       = {Zhou, Ziming and Xu, Peiyu},
+  year         = {2026},
+  howpublished = {\url{https://training-alignment.github.io/training-alignment-handbook/}},
+  note         = {Code and reports: \url{https://github.com/training-alignment/training-alignment-handbook}}
+}
+```
+
 ## Status and license
 
 This is a working draft. Numbers quoted from other reports cite their source;

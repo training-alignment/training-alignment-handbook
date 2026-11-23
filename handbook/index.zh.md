@@ -45,6 +45,7 @@ hide:
 <li markdown="span">[LoRA](2-rl/lora.md)<span class="flow-desc">一个 batch 里混用多个 adapter 时，每个 adapter 的结果保持不变。</span></li>
 <li class="flow-handoff" markdown="span">[引擎一致性](2-rl/engine-parity-vllm.md)<span class="flow-desc">让真实的推理引擎在和 trainer 相同的地方做舍入，两端结果才能一致。</span></li>
 <li markdown="span">[RL 循环](2-rl/rl-loop.md)<span class="flow-desc">记录每次 rollout，区分 staleness 和真正的不一致，并离线定位差异。</span></li>
+<li markdown="span">[实战](2-rl/walkthrough-verl.md)<span class="flow-desc">在一个真实的训练任务上走完每一步：verl 加 FSDP2，rollout 用 vLLM。</span></li>
 </ol>
 </div>
 <p class="flows-next" markdown>之后，每当软件栈或硬件发生变化，[第 4 部分：运维](4-operations/README.md)会重新检查这些结果。</p>
@@ -81,6 +82,7 @@ hide:
 4. [LoRA](2-rl/lora.md)：一个 batch 里混用多个 adapter 时，让每个 adapter 的结果保持不变。
 5. [引擎一致性](2-rl/engine-parity-vllm.md)：让真实的推理引擎在和 trainer 相同的地方做舍入，两端结果才能一致。
 6. [RL 循环](2-rl/rl-loop.md)：记录每次 rollout，区分 staleness（策略滞后）和真正的不一致，并离线定位差异。
+7. [实战](2-rl/walkthrough-verl.md)：在一个真实的训练任务上走完每一步，verl 加 FSDP2，rollout 用 vLLM。
 
 ## 第 3 部分：让一个算子不受 batch 影响
 
@@ -112,3 +114,17 @@ hide:
   [致谢](acknowledgments.md)
 
 每一页上的结论都链接到对应的报告。报告里有测量结果，也写明了测量所用的软件栈。
+
+## 引用 {#citation}
+
+如果这本手册、其中的工具或 skill 对你的工作有帮助，请引用：
+
+```bibtex
+@misc{zhou2026trainingalignment,
+  title        = {Training Alignment Handbook},
+  author       = {Zhou, Ziming and Xu, Peiyu},
+  year         = {2026},
+  howpublished = {\url{https://training-alignment.github.io/training-alignment-handbook/}},
+  note         = {Code and reports: \url{https://github.com/training-alignment/training-alignment-handbook}}
+}
+```

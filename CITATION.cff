@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this handbook, its tools or its skills, please cite it as below."
+title: "Training Alignment Handbook"
+abstract: "How to make two training or inference runs agree bit for bit, and find the first place they stop agreeing."
+type: software
+authors:
+  - family-names: "Zhou"
+    given-names: "Ziming"
+    affiliation: "University of Michigan"
+  - family-names: "Xu"
+    given-names: "Peiyu"
+    affiliation: "University of Michigan"
+repository-code: "https://github.com/training-alignment/training-alignment-handbook"
+url: "https://training-alignment.github.io/training-alignment-handbook/"
+license: Apache-2.0
+date-released: "2026-11-22"
+keywords:
+  - deterministic training
+  - batch invariance
+  - RL training-inference alignment
+  - bitwise reproducibility

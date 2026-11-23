@@ -39,6 +39,7 @@ logprob；trainer（FSDP、Megatron、TorchTitan）则重新计算同样的 logp
 <figcaption>图：第 1–5 步让每一端各自满足不变性，第 6 步让两端一致，第 7–10 步监控正在运行的训练循环。每一步都链接到对应的页面。</figcaption>
 </figure>
 
+这一部分最后的[实战](walkthrough-verl.md)在一个真实的训练任务上走了一遍这些步骤。
 遇到问题时，[alignment-pipeline skill](../../skills/alignment-pipeline/SKILL.md)
 会告诉你该看哪一步。
 
@@ -115,6 +116,7 @@ staleness = logp_trainer(v) - logp_trainer(c)   # policy lag: corrected by IS / 
 - 各步骤页面：[整个模型](whole-model.md)、[并行](parallelism.md)、
   [采样](sampling.md)、[LoRA](lora.md)、
   [引擎一致性](engine-parity-vllm.md)、[RL 循环](rl-loop.md)。
+- [实战](walkthrough-verl.md)：在一个真实的训练任务上走完这一部分的每一步，verl 加 FSDP2，rollout 用 vLLM。
 - 其他团队报告的结果（IsoExec、verl-omni、TorchTitan RL），以及一个定位到单个元素的
   完整实例：[报告](../../examples/cross_engine/REPORT.md#context-moved-from-the-part-2-overview)；
   来源列在[参考文献](../references.md)中。

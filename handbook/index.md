@@ -52,6 +52,7 @@ the third workflow, which makes it batch-invariant (part 3).
 <li markdown="span">[LoRA](2-rl/lora.md)<span class="flow-desc">Keep each adapter's result unchanged when one batch mixes several adapters.</span></li>
 <li class="flow-handoff" markdown="span">[Engine parity](2-rl/engine-parity-vllm.md)<span class="flow-desc">Make a real inference engine round at the same points as the trainer, so that the two sides agree.</span></li>
 <li markdown="span">[RL loop](2-rl/rl-loop.md)<span class="flow-desc">Record each rollout, tell staleness apart from a real mismatch, and localize any gap offline.</span></li>
+<li markdown="span">[Walkthrough](2-rl/walkthrough-verl.md)<span class="flow-desc">Follow every step on one real job: verl with FSDP2 and a vLLM rollout.</span></li>
 </ol>
 </div>
 <p class="flows-next" markdown>Afterwards, [Part 4: Operations](4-operations/README.md) checks the results again whenever the software stack or the hardware changes.</p>
@@ -106,6 +107,8 @@ Start with the [overview](2-rl/README.md). The agent skills for this part are
    round at the same points as the trainer, so that the two sides agree.
 6. [RL loop](2-rl/rl-loop.md): record each rollout, tell staleness apart from
    a real mismatch, and localize any gap offline.
+7. [Walkthrough](2-rl/walkthrough-verl.md): follow every step on one real
+   job, verl with FSDP2 and a vLLM rollout.
 
 ## Part 3: making one operator batch-invariant
 
@@ -150,3 +153,17 @@ The same method also works for other pairs of runs. See the
 
 Every claim on a page links to the report that holds its measurements and
 names the stack it was measured on.
+
+## Citation {#citation}
+
+If this handbook, its tools or its skills help your work, please cite it:
+
+```bibtex
+@misc{zhou2026trainingalignment,
+  title        = {Training Alignment Handbook},
+  author       = {Zhou, Ziming and Xu, Peiyu},
+  year         = {2026},
+  howpublished = {\url{https://training-alignment.github.io/training-alignment-handbook/}},
+  note         = {Code and reports: \url{https://github.com/training-alignment/training-alignment-handbook}}
+}
+```

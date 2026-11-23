@@ -1,9 +1,9 @@
 # References
 
 The handbook uses the sources below. Links marked * come from our working
-notes and should be checked again before publication. A comprehensive,
-categorized list is being built in the sibling repository
-`awesome-bitwise-alignment`.
+notes and should be checked again before publication. For a fuller,
+categorized list of papers, tools and blog posts, see the sibling repository
+[Awesome Bitwise Alignment](https://github.com/training-alignment/awesome-bitwise-alignment).
 
 ## Tools and methods
 
