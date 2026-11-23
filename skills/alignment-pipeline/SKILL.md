@@ -27,9 +27,6 @@ software versions it was shown on, or says "untested".
 
 Before you start either workflow on a new machine or stack, look up what has
 been measured there in [hardware coverage](../../handbook/4-operations/hardware.md).
-What is untested or still open (no record hooks in a real engine, no blind
-trial, FSDP only emulated, ...) is listed in
-[open items](../../handbook/open-items.md).
 
 ## A. Pre-training
 

@@ -147,7 +147,7 @@ The same method also works for other pairs of runs. See the
   [engine-parity](../skills/engine-parity/SKILL.md),
   [batch-invariant-kernel](../skills/batch-invariant-kernel/SKILL.md) and
   [handbook-writing](../skills/handbook-writing/SKILL.md).
-- Reference pages: [Open items](open-items.md) · [References](references.md) ·
+- Reference pages: [References](references.md) ·
   [Glossary](glossary.md) · [Audit](../AUDIT.md) · [Tools](../tools/) ·
   [Acknowledgments](acknowledgments.md)
 

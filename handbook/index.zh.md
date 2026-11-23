@@ -109,7 +109,7 @@ hide:
   [engine-parity](../skills/engine-parity/SKILL.md)、
   [batch-invariant-kernel](../skills/batch-invariant-kernel/SKILL.md) 和
   [handbook-writing](../skills/handbook-writing/SKILL.md)。
-- 参考资料：[待办事项](open-items.md) · [参考文献](references.md) ·
+- 参考资料：[参考文献](references.md) ·
   [术语表](glossary.md) · [审计](../AUDIT.md) · [工具](../tools/) ·
   [致谢](acknowledgments.md)
 

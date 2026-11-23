@@ -35,9 +35,6 @@ changes, you re-check every verdict instead of assuming that it still holds.
 | Re-run every verified check, and read what regressed or changed | [Regression](regression.md) | [tools/bi_suite.py](../../tools/bi_suite.py) |
 | Find out what was measured on which stack, and what to do on new hardware | [Hardware coverage](hardware.md) | [tools/bi_suite.py](../../tools/bi_suite.py), [tools/sdc_scan.py](../../tools/sdc_scan.py) |
 
-Everything that has not yet been run or designed is listed in
-[open items](../open-items.md).
-
 ## Building the site
 
 The handbook is also a book-style website in English and Chinese. It is built

@@ -162,4 +162,3 @@
 - Skill：[alignment-pipeline](../../skills/alignment-pipeline/SKILL.md)、
   [engine-parity](../../skills/engine-parity/SKILL.md)、
   [pretraining-alignment](../../skills/pretraining-alignment/SKILL.md)。
-- 所有尚未测试的内容，见[待办事项](../open-items.md)。

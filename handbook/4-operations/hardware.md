@@ -95,8 +95,7 @@ have not yet been shown on these platforms:
 So on such a platform, localize with OpGuard as usual, but re-verify every
 invariance claim of this handbook with the suite before you rely on it. The
 concrete stacks for each result file are in
-[measured coverage](../../suite/COVERAGE.md); the full list of open work is in
-[open items](../open-items.md).
+[measured coverage](../../suite/COVERAGE.md).
 
 ## What can go wrong
 

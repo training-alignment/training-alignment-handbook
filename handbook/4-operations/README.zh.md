@@ -33,8 +33,6 @@
 | 把每一项验证过的检查重跑一遍，看哪些回归了、哪些变了 | [回归](regression.md) | [tools/bi_suite.py](../../tools/bi_suite.py) |
 | 了解在哪套软件栈上测过什么，以及换新硬件时该做什么 | [硬件覆盖](hardware.md) | [tools/bi_suite.py](../../tools/bi_suite.py)、[tools/sdc_scan.py](../../tools/sdc_scan.py) |
 
-还没运行或还没设计的内容，都列在[待办事项](../open-items.md)里。
-
 ## 构建网站
 
 本手册同时也是一个中英双语、书籍风格的网站，用 MkDocs Material 和 mkdocs-static-i18n 根据

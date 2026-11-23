@@ -1,84 +1,70 @@
-# 待办事项
+# 尚未验证
 
-三条流程的每一页上，凡是会改变读者做法的缺口，都用一行"尚未证明"点出来。完整的列表放在本页，
-包括本手册还没跑、跑不了或还没设计的所有事项。这些事项来自第 1–3 部分各主题页的"局限"小节、
-[回归](4-operations/regression.md#limits)、[硬件覆盖](4-operations/hardware.md#untested)和
-[审计](../AUDIT.md)。细节留在各主题页上，本页只保留列表。某一项完成后，从这里删掉，并更新它的主题页。
+手册里的结论都是在少数几种机器和软件栈上测出来的。这一页列出还没验证的部分，方便你判断自己的环境在不在覆盖范围里。
+各页正文里，凡是会改变你做法的缺口，都有一行"尚未证明"。
 
-## 需要硬件，或需要这里装不上的软件
+OpGuard 本身已经在大规模集群的生产训练中使用
+（[OpGuard 论文](https://www.usenix.org/conference/osdi26/presentation/zhou-ziming)）。
+下面的缺口指的是本手册自己的 kernel、修复和案例。
 
-据 OpGuard 的作者报告
-（[OpGuard 论文](https://www.usenix.org/conference/osdi26/presentation/zhou-ziming)），
-OpGuard 本身（采集、fingerprint、找首个分歧点的比较）已经在前四项列出的平台上用于生产环境的
-LLM 训练。还没做的，是本手册自己在这些平台上的测量，包括 batch-invariant kernel 和各种修复、
-固定的集合通信树，以及引擎一致性的那套搭建。
+## 硬件与精度
 
-- 其他 GPU 架构和其他加速器：这里一台都没有。测过哪些软件栈，以及 OpGuard 自己的结果和本手册的
-  结果怎么区分，见[硬件覆盖](4-operations/hardware.md#untested)。
-- FP8 tensor-core GEMM 及其精度提升间隔、NVFP4；其他 GPU 架构上的 FlashAttention 3、FlashMLA 和
-  FlashInfer。目前的 FP8 scale 都是模拟的。
-- NVLink、NVSwitch 和 NVLS；RDMA、InfiniBand 和 RoCE；两个以上的节点。本手册所有多 GPU 的结果，
-  节点内走的都是 PCIe，两个节点之间走的是普通以太网 socket。
-- 手册里的 kernel 在其他版本的 torch、Triton、NCCL 和 CUDA 上的表现。目前只测了一套软件栈，
-  跨引擎案例另外用了 vLLM 自带的软件栈，verl × FSDP2 × vLLM 案例也有自己的一套软件栈
-  （[报告](../examples/verl_fsdp2_vllm/REPORT.md)）。
-- L4 下的 SGLang：这里的引擎环境缺少 SGLang 需要的 CUDA 库。
-- 在引擎里使用真实的预训练 checkpoint 或 MoE checkpoint：一个真实的 MoE checkpoint 已经在完整的
-  RL 循环里、TP 1 下达到 L4（[报告](../examples/verl_fsdp2_vllm/REPORT.md)）。带 TP 或 EP 的 L4、
-  prefix caching 和 speculative decoding 还没有验证：这需要下载权重。
-  在[整模型案例](../examples/whole_model/REPORT.md)里，只用随机权重检查过一个真实架构，而且只检查了其中几层。
-- 把 `fla`（flash-linear-attention）作为 GDN kernel 的生产基线：还没有安装。
+- **其他代际的 GPU 和其他加速器。** 所有结果都在少数几种 NVIDIA GPU 上测得，见
+  [硬件覆盖](4-operations/hardware.md#untested)。换一代 GPU，kernel 可能选不同的 tile，
+  所以在依赖某个结果之前，先跑一遍回归检查。
+- **FP8 和 NVFP4 的 tensor-core GEMM。** 目前的 FP8 scale 都是模拟的。
+- **FlashAttention 3、FlashMLA 和 FlashInfer**，在测过的 GPU 之外的代际上。
 
-## 需要在现有机器上花 GPU 时间
+## 规模与互联
 
-- 真正的 `torch.distributed.fsdp`：probe 已经写好，但从来没有启动过。
-  [DP 案例](1-pretraining/data-parallel.md)是模拟出来的 FSDP 风格（扁平梯度、reduce-scatter、
-  分片的 AdamW）。那里也还没测 bf16 梯度、混合精度和 loss scaling。
-- 套件的 full 模式：从来没有通过 `tools/bi_suite.py` 运行过。最近加入的几个条目的 full 命令没有
-  验证过，目前只有 quick 模式的基线。
-- CI 工作流（`.github/workflows/bi-suite.yml`）从来没有运行过，需要在自托管的 GPU runner 上跑一次。
-- `perfetto/token_match.py`（OpGuard）还从来没有在 [rl-loop](2-rl/rl-loop.md) 导出的结果上运行过。
-- 强化学习重放：batch-invariant 的重放还没有和按原始 batch 组成的重放比较过；混合了多个策略版本
-  的 batch 也还没有重新采集。
-- OpGuard 的 `tests/test_xor_vectors.py`：只在 GPU 上跑的那些路径（原生 kernel 对比回退实现、
-  每种 dtype 的 v1 采集、经过 tracer 的工作负载），在最近一次修改 XOR 向量之后没有重新运行。
-- 审计里的 GPU 抽查重跑：对照 `~/bi-check-suite` 的校验和，以及在第二种 GPU 上运行
-  `lora_bi.py --quick` 和 `sampling_bi.py --quick` 并与它的基线比较
-  （[AUDIT.md 第 5 节](../AUDIT.md#5-gpu-re-run)）。
-- 有几个原生 kernel 的失败（kernel 案例、LoRA、MLA、MoE）在第二种 GPU 上用 quick 尺寸跑时反而通过了，
-  需要在那里用 full 尺寸再跑一遍。在那之前，这些失败只算在第一种 GPU 上成立
-  （[测得的覆盖范围](../suite/COVERAGE.md)）。
-- 用 OpGuard 做预训练对齐时还没测的部分：跨多个 rank 的采集、CUPTI 和 CUDA-API 两种调用点后端，
-  以及 fused AdamW 与 foreach 版本的对比。
-- 只在 eager 下测过的 kernel，用 `torch.compile` 和 CUDA graph 时的结果：注意力反向、paged kernel
-  和 varlen kernel、线性注意力、LoRA、MLA 和稀疏注意力、采样、整个模型，以及 TP。
-- 还没跑过的反向路径：EP 下的 MoE、TP 的参数梯度，以及 KV cache 路径。
+- **两个以上的节点，以及高速互联**（NVLink、NVSwitch、NVLS、InfiniBand、RoCE）。
+  所有多 GPU 结果都是节点内走 PCIe、两个节点之间走普通以太网。集合通信的算法会随网络变化，
+  固定的归约树需要在这些网络上重新检查。
+- **真正的 `torch.distributed.fsdp`。** [数据并行的案例](1-pretraining/data-parallel.md)
+  是模拟的 FSDP（扁平梯度、reduce-scatter、切分的 AdamW）。bf16 梯度、混合精度和 loss scaling
+  都没测过。[verl 案例](2-rl/walkthrough-verl.md)用的是真正的 FSDP2，但只检查了 logprob，
+  没有检查预训练的一步。
+- **多 rank 预训练上的 OpGuard。** 预训练案例只采集了一个 rank；跨 rank 的采集和 CUPTI
+  调用点后端都还没验证。
+- **DeepSpeed ZeRO 和 Megatron**，包括 Megatron 自己的 all-reduce。
 
-## 需要和引擎或框架集成
+## 引擎与 RL 框架
 
-- 在 vLLM、SGLang、verl 和 OpenRLHF 里加上写记录的 hook（`RecordWriter.forward`、`rollout_batch`、
-  `rows`）。目前只有 `examples/rl_loop/rl_core.py` 里的玩具引擎写出过记录。
-- 与编译后的 vLLM 对齐：使用 CUDA graph、关闭编译器的 rollout 已经对齐
-  （[报告](../examples/verl_fsdp2_vllm/REPORT.md)），但用 torch.compile 编译的 vLLM（这是它的
-  默认设置）还没有对齐。
-  要在那里定位差异，需要在编译后的图里用 OpGuard 的逐向量 fingerprint，这还没有在任何引擎上
-  演示过。
-- 超出已测案例的 vLLM L4：prefix caching、speculative decoding、带温度的采样、TP、
-  带 EP 的 MoE 和 LoRA。
-- kernel 案例与 trainer 之间的 L4：MoE（combine 和 EP）、MLA 和稀疏注意力、线性注意力，以及
-  注意力 kernel。
-- DeepSpeed ZeRO-1/2/3、Megatron 的 kernel 和它自定义的 all-reduce。
+- **SGLang 的 L4。** 还没跑。
+- **verl 案例之外的 vLLM。** 一个真实的 MoE checkpoint 在每个副本一个 GPU、关掉编译器的条件下
+  达到了 L4（[报告](../examples/verl_fsdp2_vllm/REPORT.md)）。没验证的有：张量并行或 expert 并行、
+  prefix caching、speculative decoding、LoRA，以及 vLLM 默认的编译模式。
+- **在编译后的 graph 里定位。** OpGuard 看到的是 Python 调用点，所以 torch.compile 或
+  CUDA graph 区域里的差异，只能先在 eager 模式下复现出来再定位。
+- **真实引擎写出的在线记录。** [RL 训练循环](2-rl/rl-loop.md)的记录目前只从一个玩具引擎写出过，
+  还没有从 vLLM、SGLang、verl 或 OpenRLHF 写出过。
+- **kernel 案例对 trainer 的比较。** MoE、MLA、稀疏注意力和线性注意力各自满足不变性，
+  但都还没有和某个 trainer 对到 L4。
+- **整个模型案例里的真实权重。** 一种真实架构只用随机权重检查过，而且只检查了几层
+  （[报告](../examples/whole_model/REPORT.md)）。
+- **在原始 batch 里重放。** RL 的重放只在 batch-invariant kernel 下跑过；混合了多个策略版本的
+  batch 还没有重新采集过。
 
-## 需要先做设计
+## 编译代码与反向
 
-- 盲测：让一个不知道事先植入了什么原因的 agent 按 `alignment-pipeline` 走一遍（预训练和强化学习
-  两条路径都要走），同时记下它启动了什么、调用了哪些 harness。到目前为止，所有端到端案例都是
-  已知答案的演示。
-- fused AdamW 和 fused SGD：它们确切的求和顺序还没有弄清楚。我们对它们顺序的建模很接近，但并不
-  精确（[训练 step](1-pretraining/training-step.md)）。
-- OpGuard 的覆盖范围：`torch.nn.Linear` 内部的 GEMM 不会被采集，因为它们是从 torch 自己的文件里
-  启动的；模型代码里的单字母变量名也会妨碍包装
+- **torch.compile 和 CUDA graph**，针对只在 eager 模式下测过的 kernel：attention 反向、
+  paged 和 varlen attention、线性注意力、LoRA、MLA、采样、整个模型和 TP。
+- **还没跑过的反向：** expert 并行下的 MoE、TP 的参数梯度，以及 KV cache 路径。
+
+## 还需要设计的方法
+
+- **盲测。** 目前每个端到端案例都事先埋好了已知原因，还没有在不告诉 agent 答案的情况下
+  让它走完整条流程。
+- **融合优化器。** 融合版 AdamW 和 SGD 的精确求和顺序还不清楚；我们对它的模拟很接近，但不精确
+  （[训练 step](1-pretraining/training-step.md)）。
+- **OpGuard 的覆盖缺口。** `torch.nn.Linear` 里的 GEMM 采集不到，有些模型代码也包装不了
   （[预训练案例](1-pretraining/localize-with-opguard.md)）。
-- 还没写的 kernel：递归 GDN 前向对应的反向、paged 注意力的反向，以及用于长 decode 的固定大小 split-KV。
-- MoE 路由规则：在 expert 所在的 rank 上按 capacity 丢弃 token，以及分数完全相同时按
-  (score, expert id) 决定先后。
+- **还没写的 kernel：** 循环形式 GDN 的反向、paged attention 的反向，以及长 decode 用的固定大小
+  split-KV。
+- **MoE 路由规则**：按 capacity 丢 token 的规则，以及分数完全相同时怎么打破平局。
+
+## 本仓库还没重跑的检查
+
+- 回归检查只有 quick 模式的基线；full 模式和 CI 工作流都还没跑过。原生 kernel 的一些失败
+  只在一种 GPU 上得到确认（[实测覆盖](../suite/COVERAGE.md)）。
+- [审计](../AUDIT.md#5-gpu-re-run)里列出的几项 GPU 重跑还没完成。

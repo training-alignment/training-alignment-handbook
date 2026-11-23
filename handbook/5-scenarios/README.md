@@ -210,4 +210,3 @@ run that mixes GPU generations.
 - Skills: [alignment-pipeline](../../skills/alignment-pipeline/SKILL.md),
   [engine-parity](../../skills/engine-parity/SKILL.md),
   [pretraining-alignment](../../skills/pretraining-alignment/SKILL.md).
-- [Open items](../open-items.md) lists everything that is still untested.

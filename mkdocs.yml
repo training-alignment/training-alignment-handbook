@@ -14,6 +14,11 @@ extra:
   #   https://github.com/ORG/training-alignment-handbook/blob/main
   source_url: !ENV [HANDBOOK_SOURCE_URL, ""]
 
+# Hidden from the site for now; the page stays in the repository.
+exclude_docs: |
+  open-items.md
+  open-items.zh.md
+
 hooks:
   - scripts/mkdocs_hooks.py
 
@@ -182,7 +187,6 @@ nav:
           - skills/batch-invariant-kernel/SKILL.md
           - skills/batch-invariant-kernel/references/operator-recipes.md
           - skills/batch-invariant-kernel/references/verification.md
-  - open-items.md
   - references.md
   - glossary.md
   - acknowledgments.md

@@ -70,7 +70,7 @@ method for other pairs of runs.
   [Checkpoint conversion](handbook/5-scenarios/checkpoint-conversion.md) ·
   [Offline post-training](handbook/5-scenarios/offline-post-training.md)
 
-Reference: [Glossary](handbook/glossary.md) · [Open items](handbook/open-items.md) ·
+Reference: [Glossary](handbook/glossary.md) · [Not yet shown](handbook/open-items.md) ·
 [References](handbook/references.md) · [Audit](AUDIT.md) ·
 [Acknowledgments](handbook/acknowledgments.md)
 
@@ -152,6 +152,6 @@ GitHub's "Cite this repository" button reads the same entry from
 
 This is a working draft. Numbers quoted from other reports cite their source;
 numbers measured here link to the report that measured them, and what is not
-yet shown is listed in [Open items](handbook/open-items.md).
+yet shown is listed in [Not yet shown](handbook/open-items.md).
 
 Licensed under the [Apache License 2.0](LICENSE).

@@ -24,8 +24,7 @@ description: 判断一个逐 bit 对齐问题该走哪条流程，并把它从�
 | 换了新的软硬件栈（torch、Triton、NCCL、驱动、CUDA、GPU） | 先跑一遍回归套件，做法见 [regression](../../handbook/4-operations/regression.md) |
 
 在新机器或新栈上开始任何一条流程之前，先到[硬件覆盖](../../handbook/4-operations/hardware.md)
-里看看那里已经测过什么。还没测过、或者仍未解决的问题（真实引擎里还没有记录 hook、
-没做过盲测、FSDP 只是模拟实现……）都列在[待办事项](../../handbook/open-items.md)里。
+里看看那里已经测过什么。
 
 ## A. 预训练
 
