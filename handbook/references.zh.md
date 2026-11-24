@@ -5,27 +5,27 @@
 
 ## 工具与方法
 
-- OpGuard: Bitwise Alignment for Precise and General Debugging of Production LLM
-  Training, OSDI '26. https://www.usenix.org/conference/osdi26/presentation/zhou-ziming
-- Thinking Machines, "Defeating Nondeterminism in LLM Inference" (2025)。文章指出，推理之所以
-  不确定，是因为缺乏 batch invariance，并给出了不变的 RMSNorm、矩阵乘法和注意力 kernel。
-  https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/ *
-- `batch_invariant_ops`（Thinking Machines）。https://github.com/thinking-machines-lab/batch_invariant_ops *
-- PyTorch 关于可复现性的说明。https://pytorch.org/docs/stable/notes/randomness.html
-- cuBLAS 关于结果可复现性的说明。https://docs.nvidia.com/cuda/cublas/#results-reproducibility *
+- [OpGuard: Bitwise Alignment for Precise and General Debugging of Production LLM
+  Training](https://www.usenix.org/conference/osdi26/presentation/zhou-ziming), OSDI '26.
+- Thinking Machines, ["Defeating Nondeterminism in LLM Inference"](https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/)
+  (2025) \*。文章指出，推理之所以不确定，是因为缺乏 batch invariance，并给出了不变的 RMSNorm、
+  矩阵乘法和注意力 kernel。
+- [`batch_invariant_ops`](https://github.com/thinking-machines-lab/batch_invariant_ops)（Thinking Machines）\*。
+- PyTorch 关于[可复现性](https://pytorch.org/docs/stable/notes/randomness.html)的说明。
+- cuBLAS 关于[结果可复现性](https://docs.nvidia.com/cuda/cublas/#results-reproducibility)的说明 \*。
 
 ## 强化学习的训推对齐
 
-- IsoExec: Unified Execution to Eliminate Trainer-Inference Mismatch in SkyRL
-  （vLLM blog，2026-08-21）。https://vllm.ai/blog/2026-08-21-isoexec
-- Finish RL Training Faster: Bitwise-Consistent, High-Performance, Agent-Driven
-  （vLLM blog，2026-10-14）。https://vllm.ai/blog/2026-10-14-train-inference-consistency
-- Yichuan Wang et al., Closing the Training–Inference Mismatch for Linear
-  Attention in RL（异步强化学习，GDN）。https://yichuan-w.github.io/blog/GDN-train-inference-mismatch-asyncRL/
-- verl-omni issue #637：用 HF 的数值实现，让 rollout 和 actor 逐 bit 一致的一种模式。
-  https://github.com/verl-project/verl-omni/issues/637
-- Yingru Li et al., When Speed Kills Stability: Demystifying RL Collapse from the
-  Training–Inference Mismatch. https://yingru.notion.site/When-Speed-Kills-Stability-271211a558b7808d8b12d403fd15edda
+- [IsoExec: Unified Execution to Eliminate Trainer-Inference Mismatch in SkyRL](https://vllm.ai/blog/2026-08-21-isoexec)
+  （vLLM blog，2026-08-21）。
+- [Finish RL Training Faster: Bitwise-Consistent, High-Performance, Agent-Driven](https://vllm.ai/blog/2026-10-14-train-inference-consistency)
+  （vLLM blog，2026-10-14）。
+- Yichuan Wang et al., [Closing the Training–Inference Mismatch for Linear
+  Attention in RL](https://yichuan-w.github.io/blog/GDN-train-inference-mismatch-asyncRL/)（异步强化学习，GDN）。
+- [verl-omni issue #637](https://github.com/verl-project/verl-omni/issues/637)：用 HF 的数值实现，让 rollout 和 actor
+  逐 bit 一致的一种模式。
+- Yingru Li et al., [When Speed Kills Stability: Demystifying RL Collapse from the
+  Training–Inference Mismatch](https://yingru.notion.site/When-Speed-Kills-Stability-271211a558b7808d8b12d403fd15edda)。
 
 ## 本仓库里的测量
 
